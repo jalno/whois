@@ -23,7 +23,7 @@ class ir_handler {
             'holder-c' => 'owner'
         );
 
-        $reg = generic_parser_a($data_str['rawdata'], $translate, $contacts, 'domain', 'Y-m-d');
+        $reg = generic_parser_a($data_str['rawdata'], $translate, $contacts, 'domain', 'Ymd');
 
         $r = array();
         $r['regrinfo'] = $reg;
