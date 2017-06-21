@@ -13,10 +13,10 @@ class fabulous_handler {
 
         $r = easy_parser($data_str, $items, 'mdy', array(), false, true);
 
-        if (!isset($r['tech']))
+        if (!isset($r['tech']) and isset($r['billing']))
             $r['tech'] = $r['billing'];
 
-        if (!isset($r['admin']))
+        if (!isset($r['admin']) and isset($r['tech']))
             $r['admin'] = $r['tech'];
 
         return $r;
