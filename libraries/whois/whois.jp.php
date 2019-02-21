@@ -1,6 +1,6 @@
 <?php
 namespace packages\whois;
-use phpWhois\WhoisClient;
+use packages\whois\WhoisClient;
 class jp_handler extends WhoisClient {
 
     function parse($data_str, $query) {
