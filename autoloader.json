@@ -405,7 +405,8 @@
 			"file":"libraries/whois/whois.org.za.php"
 		},
 		{
-			"file":"libraries/whois/whois.parser.php"
+			"file":"libraries/whois/whois.parser.php",
+			"function": true
 		},
 		{
 			"classes":["pl_handler"],
