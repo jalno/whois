@@ -763,16 +763,13 @@ function get_date($date, $format)
 			}
 		}
 	} else {
-		$format = strtolower($format);
-
+		$format = str_replace('-', '', strtolower($format));
 		for ($p = $i = 0; $p < count($parts) && $i < strlen($format); $p++) {
 			if (trim($parts[$p]) === '') {
 				continue;
 			}
+			$res[$format[$i]] = $parts[$p];
 
-			if ($format[$i] !== '-') {
-				$res[$format[$i]] = $parts[$p];
-			}
 			$i++;
 		}
 	}
