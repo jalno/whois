@@ -493,7 +493,8 @@
 			"file":"libraries/idna-convert/idna_convert.php"
 		},
 		{
-			"file":"libraries/idna-convert/transcode_wrapper.php"
+			"file":"libraries/idna-convert/transcode_wrapper.php",
+			"function": true
 		},
 		{
 			"classes":["uctc"],

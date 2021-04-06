@@ -58,7 +58,7 @@ class api extends WhoisClient{
         }
 
         // If domain to query was not set
-        if (!isset($query) || $query == '') {
+        if ($query == '') {
             // Configure to use default whois server
             $this->query['server'] = $this->nsiRegistry;
             return;

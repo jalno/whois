@@ -8,7 +8,6 @@ class apnic_handler {
             'e-mail' => 'email',
             'nic-hdl' => 'handle',
             'person' => 'name',
-            'country' => 'address',
             'netname' => 'name',
             'descr' => 'desc',
             'aut-num' => 'handle',

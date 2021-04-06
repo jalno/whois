@@ -19,19 +19,15 @@ function encode_utf8($string = '', $encoding = 'iso-8859-1', $safe_mode = false)
         $conv = @iconv(strtoupper($encoding), 'UTF-8', $string);
         if ($conv) return $conv;
     }
-    if (function_exists('libiconv')) {
-        $conv = @libiconv(strtoupper($encoding), 'UTF-8', $string);
-        if ($conv) return $conv;
-    }
     return $safe;
 }
 
 /**
  * Convert a string from UTF-8 to any of various encodings
  *
- * @param  string  String to decode
- *[@param  string  Encoding; Default: ISO-8859-1]
- *[@param  bool  Safe Mode: if set to TRUE, the original string is retunred on errors]
+ * @param  string  $string String to decode
+ * @param  string  $encoding Encoding; Default: ISO-8859-1
+ * @param  bool  $safe_mode Safe Mode: if set to TRUE, the original string is retunred on errors
  * @return  string  The decoded string or false on failure
  * @since 0.0.1
  */
@@ -56,18 +52,14 @@ function decode_utf8($string = '', $encoding = 'iso-8859-1', $safe_mode = false)
         $conv = @iconv('UTF-8', strtoupper($encoding), $string);
         if ($conv) return $conv;
     }
-    if (function_exists('libiconv')) {
-        $conv = @libiconv('UTF-8', strtoupper($encoding), $string);
-        if ($conv) return $conv;
-    }
     return $safe;
 }
 
 /**
  * Special treatment for our guys in Redmond
  * Windows-1252 is basically ISO-8859-1 -- with some exceptions, which get accounted for here
- * @param  string  Your input in Win1252
- * @param  string  The resulting ISO-8859-1 string
+ * @param  string  $string Your input in Win1252
+ * @return  string  The resulting ISO-8859-1 string
  * @since 3.0.8
  */
 function map_w1252_iso8859_1($string = '')
@@ -75,7 +67,7 @@ function map_w1252_iso8859_1($string = '')
     if ($string == '') return '';
     $return = '';
     for ($i = 0; $i < strlen($string); ++$i) {
-        $c = ord($string{$i});
+        $c = ord($string[$i]);
         switch ($c) {
             case 129: $return .= chr(252); break;
             case 132: $return .= chr(228); break;
@@ -93,8 +85,8 @@ function map_w1252_iso8859_1($string = '')
 /**
  * Special treatment for our guys in Redmond
  * Windows-1252 is basically ISO-8859-1 -- with some exceptions, which get accounted for here
- * @param  string  Your input in ISO-8859-1
- * @param  string  The resulting Win1252 string
+ * @param  string  $string Your input in ISO-8859-1
+ * @return  string  The resulting Win1252 string
  * @since 3.0.8
  */
 function map_iso8859_1_w1252($string = '')
@@ -102,7 +94,7 @@ function map_iso8859_1_w1252($string = '')
     if ($string == '') return '';
     $return = '';
     for ($i = 0; $i < strlen($string); ++$i) {
-        $c = ord($string{$i});
+        $c = ord($string[$i]);
         switch ($c) {
             case 196: $return .= chr(142); break;
             case 214: $return .= chr(153); break;
@@ -116,5 +108,3 @@ function map_iso8859_1_w1252($string = '')
     }
     return $return;
 }
-
-?>

@@ -128,7 +128,7 @@ class IpTools
         }
 
         $bits1 = str_pad(decbin(ip2long($start)), 32, '0', 'STR_PAD_LEFT');
-        $net = pow(2, (32 - substr(strstr($net, '/'), 1))) - 1;
+        $net = pow(2, (32 - intval(substr(strstr($net, '/'), 1)))) - 1;
         $bits2 = str_pad(decbin($net), 32, '0', 'STR_PAD_LEFT');
         $final = '';
 

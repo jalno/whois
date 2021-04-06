@@ -18,7 +18,7 @@ class edu_handler {
         $r = array();
         $r['regrinfo'] = easy_parser($data_str['rawdata'], $items, 'dmy');
 
-        if (isset($b['tech'])) {
+        if (isset($r['tech'])) {
             if ($r['regrinfo']['tech']['name'] == 'Same as above')
                 $r['regrinfo']['tech'] = $r['regrinfo']['admin'];
         }

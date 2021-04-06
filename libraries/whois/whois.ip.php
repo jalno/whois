@@ -2,7 +2,7 @@
 namespace packages\whois;
 class ip_handler extends WhoisClient {
 
-    /** @var Deep whois? */
+    /** @var bool whois? */
     public $deepWhois = true;
     public $REGISTRARS = array(
         'European Regional Internet Registry/RIPE NCC' => 'whois.ripe.net',
@@ -205,7 +205,6 @@ class ip_handler extends WhoisClient {
         } else {
             $q['handler'] = 'rwhois';
             $q['reset'] = false;
-            unset($q['file']);
         }
 
         $this->more_data[] = $q;

@@ -1,4 +1,3 @@
 {
-	"permissions": "*",
 	"autoload":"autoloader.json"
 }

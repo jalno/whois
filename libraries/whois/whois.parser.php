@@ -410,7 +410,7 @@ function get_blocks($rawdata, $items, $partial_match = false, $def_block = false
 
 	$r = array();
 	$endtag = '';
-
+	$line = "";
 	while ($val = current($rawdata)) {
 		next($rawdata);
 		

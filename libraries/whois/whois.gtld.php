@@ -16,9 +16,11 @@ class gtld_handler extends WhoisClient {
         'Created On:' => 'regrinfo.domain.created',
         'Expiration Date:' => 'regrinfo.domain.expires',
         'Registry Expiry Date:' => 'regrinfo.domain.expires',
-        'Updated Date:' => 'regrinfo.domain.changed',
         'No match for ' => 'nodomain'
     );
+
+    public $result;
+    protected $deepWhois;
 
     function parse($data, $query) {
         $this->query = array();

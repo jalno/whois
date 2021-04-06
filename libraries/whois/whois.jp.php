@@ -2,7 +2,7 @@
 namespace packages\whois;
 use packages\whois\WhoisClient;
 class jp_handler extends WhoisClient {
-
+	public $deepWhois;
     function parse($data_str, $query) {
         $items = array(
             '[State]' => 'domain.status',

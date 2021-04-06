@@ -25,10 +25,10 @@ class WhoisClient
     /** @var int Communications timeout */
     public $stimeout = 10;
 
-    /** @var string[] List of servers and handlers (loaded from servers.whois) */
+    /** @var array<string,string> List of servers and handlers (loaded from servers.whois) */
     public $DATA = array();
 
-    /** @var string[] Non UTF-8 servers */
+    /** @var array<string, int> Non UTF-8 servers */
     public $NON_UTF8 = array();
 
     /** @var string[] List of Whois servers with special parameters */
@@ -40,13 +40,14 @@ class WhoisClient
     /** @var string[] Handled gTLD whois servers */
     public $WHOIS_GTLD_HANDLER = array();
 
-    /** @var string[] Array to contain all query publiciables */
+    /** @var mixed Array to contain all query publiciables */
     public $query = array(
         'tld' => '',
         'type' => 'domain',
         'query' => '',
         'status',
-        'server'
+        'server',
+		'errstr' => []
     );
 
     /** @var string Current release of the package */
@@ -717,10 +718,9 @@ class WhoisClient
         if (isset($this->query['errstr'])) {
             unset($this->query['errstr']);
         }
-
         if (!isset($this->query['server'])) {
             $this->query['status'] = 'error';
-            $this->query['errstr'][] = 'No server specified';
+            $this->query['errstr'] = ['No server specified'];
             return (array());
         }
 
@@ -728,11 +728,11 @@ class WhoisClient
         if (substr($this->query['server'], 0, 7) == 'http://' ||
             substr($this->query['server'], 0, 8) == 'https://'
         ) {
-            $output = $this->httpQuery($this->query['server']);
+            $output = $this->httpQuery();
 
             if (!$output) {
                 $this->query['status'] = 'error';
-                $this->query['errstr'][] = 'Connect failed to: ' . $this->query['server'];
+                $this->query['errstr'] = ['Connect failed to: ' . $this->query['server']];
                 return (array());
             }
 
@@ -795,7 +795,7 @@ class WhoisClient
 
             if ($ptr === false) {
                 $this->query['status'] = 'error';
-                $this->query['errstr'][] = 'Connect failed to: ' . $this->query['server'];
+                $this->query['errstr'] = ['Connect failed to: ' . $this->query['server']];
                 return array();
             }
 
@@ -820,7 +820,7 @@ class WhoisClient
 
                 if (time() - $start > $this->stimeout) {
                     $this->query['status'] = 'error';
-                    $this->query['errstr'][] = 'Timeout reading from ' . $this->query['server'];
+                    $this->query['errstr'] = ['Timeout reading from ' . $this->query['server']];
                     return array();
                 }
             }
@@ -909,7 +909,7 @@ class WhoisClient
     /**
      * Adds whois server query information to result
      *
-     * @param $result array Result array
+     * @param array $result Result array
      * @return array Original result array with server query information
      */
     public function setWhoisInfo($result)
@@ -946,7 +946,7 @@ class WhoisClient
     /**
      * Convert html output to plain text
      *
-     * @return array Rawdata
+     * @return array|null Rawdata
      */
     public function httpQuery()
     {
@@ -956,7 +956,7 @@ class WhoisClient
         $lines = @file($this->query['server']);
 
         if (!$lines) {
-            return false;
+            return null;
         }
 
         $output = '';
@@ -1238,7 +1238,7 @@ class WhoisClient
     /**
      * Parse server string into array with host and port keys
      *
-     * @param $server   server string in various formattes
+     * @param string $server   server in various formattes
      * @return array    Array containing 'host' key with server host and 'port' if defined in original $server string
      */
     public function parseServer($server)
