@@ -56,6 +56,11 @@ class WhoisClient
     /** @var string Full code and data version string (e.g. 'Whois2.php v3.01:16') */
     public $version;
 
+	public $result = array();
+
+	/** @property bool $deepWhois */
+	public $deepWhois = true;
+
     /**
      * Constructor function
      */

@@ -13,7 +13,6 @@ class arin_handler {
             'PostalCode:' => 'owner.address.pcode',
             'Country:' => 'owner.address.country',
             'NetRange:' => 'network.inetnum',
-            'NetHandle:' => 'network.handle',
             'NetType:' => 'network.status',
             'NameServer:' => 'network.nserver.',
             'Comment:' => 'network.desc.',
