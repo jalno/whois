@@ -19,7 +19,6 @@ class gtld_handler extends WhoisClient {
     );
 
     public $result;
-    protected $deepWhois;
 
     function parse($data, $query) {
         $this->query = array();
