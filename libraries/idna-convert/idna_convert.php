@@ -34,8 +34,7 @@ class idna_convert {
     protected $_allow_overlong = false;  // Overlong UTF-8 encodings are forbidden
     protected $_strict_mode = false;     // Behave strict or not
     protected $_idn_version = 2003;      // Can be either 2003 (old, default) or 2008
-    public $slast;
-    
+
     /**
      * the constructor
      *
@@ -43,9 +42,8 @@ class idna_convert {
      * @return boolean
      * @since 0.5.2
      */
-    public function __construct($options = null)
+    public function __construct(? array $options = null)
     {
-        $this->slast = $this->_sbase + $this->_lcount * $this->_vcount * $this->_tcount;
         // If parameters are given, pass these to the respective method
         if (is_array($options)) {
             $this->set_parameter($options);
@@ -73,8 +71,8 @@ class idna_convert {
      *           on failures; false: loose mode, ideal for "wildlife" applications
      *           by silently ignoring errors and returning the original input instead
      *
-     * @param    mixed     $option Parameter to set (string: single parameter; array of Parameter => Value pairs)
-     * @param    string|null    $value Value to use (if parameter 1 is a string)
+     * @param    mixed $option     Parameter to set (string: single parameter; array of Parameter => Value pairs)
+     * @param    string|null $value    Value to use (if parameter 1 is a string)
      * @return   boolean   true on success, false otherwise
      */
     public function set_parameter($option, $value = null)
@@ -126,11 +124,11 @@ class idna_convert {
 
     /**
      * Decode a given ACE domain name
-     * @param    string   $input Domain name (ACE string)
-     * @param    string|null   $one_time_encoding Desired output encoding, see {@link set_parameter}
-     * @return   string|null   Decoded Domain name (UTF-8 or UCS-4)
+     * @param    string $input  Domain name (ACE string)
+     * [@param    string $one_time_encoding   Desired output encoding, see {@link set_parameter}]
+     * @return   string|false   Decoded Domain name (UTF-8 or UCS-4)
      */
-    public function decode($input, $one_time_encoding = null)
+    public function decode($input, $one_time_encoding = false)
     {
         // Optionally set
         if ($one_time_encoding) {
@@ -141,7 +139,7 @@ class idna_convert {
                     break;
                 default:
                     $this->_error('Unknown encoding ' . $one_time_encoding);
-                    return null;
+                    return false;
             }
         }
         // Make sure to drop any newline characters around
@@ -153,7 +151,7 @@ class idna_convert {
             // No no in strict mode
             if ($this->_strict_mode) {
                 $this->_error('Only simple domain name parts can be handled in strict mode');
-                return null;
+                return false;
             }
             list ($email_pref, $input) = explode('@', $input, 2);
             $arr = explode('.', $input);
@@ -181,7 +179,7 @@ class idna_convert {
             // No no in strict mode
             if ($this->_strict_mode) {
                 $this->_error('Only simple domain name parts can be handled in strict mode');
-                return null;
+                return false;
             }
             $parsed = parse_url($input);
             if (isset($parsed['host'])) {
@@ -220,17 +218,17 @@ class idna_convert {
             case 'utf8':        return $return; // break;
             case 'ucs4_string': return $this->_ucs4_to_ucs4_string($this->_utf8_to_ucs4($return));  // break;
             case 'ucs4_array':  return $this->_utf8_to_ucs4($return); // break;
-            default:            $this->_error('Unsupported output format'); return null;
+            default:            $this->_error('Unsupported output format'); return false;
         }
     }
 
     /**
      * Encode a given UTF-8 domain name
-     * @param    string   $decoded Domain name (UTF-8 or UCS-4)
-     * @param    string|null   $one_time_encoding Desired input encoding, see {@link set_parameter}
-     * @return   string|null   Encoded Domain name (ACE string)
+     * @param    string $decoded   Domain name (UTF-8 or UCS-4)
+     * [@param    string $one_time_encoding   Desired input encoding, see {@link set_parameter}]
+     * @return   string|false   Encoded Domain name (ACE string)
      */
-    public function encode($decoded, $one_time_encoding = null)
+    public function encode($decoded, $one_time_encoding = false)
     {
         // Forcing conversion of input to UCS4 array
         // If one time encoding is given, use this, else the objects property
@@ -244,7 +242,7 @@ class idna_convert {
                 break;
             default:
                 $this->_error('Unsupported input format: ' . ($one_time_encoding ? $one_time_encoding : $this->_api_encoding));
-                return null;
+                return false;
         }
 
         // No input, no output, what else did you expect?
@@ -273,7 +271,7 @@ class idna_convert {
                     // Neither email addresses nor URLs allowed in strict mode
                     if ($this->_strict_mode) {
                         $this->_error('Neither email addresses nor URLs are allowed in strict mode.');
-                        return null;
+                        return false;
                     } else {
                         // Skip first char
                         if ($k) {
@@ -314,7 +312,7 @@ class idna_convert {
      * Removes a weakness of encode(), which cannot properly handle URIs but instead encodes their
      * path or query components, too.
      * @param string  $uri  Expects the URI as a UTF-8 (or ASCII) string
-     * @return  string|null  The URI encoded to Punycode, everything but the host component is left alone
+     * @return  string|false  The URI encoded to Punycode, everything but the host component is left alone
      * @since 0.6.4
      */
     public function encode_uri($uri)
@@ -322,7 +320,7 @@ class idna_convert {
         $parsed = parse_url($uri);
         if (!isset($parsed['host'])) {
             $this->_error('The given string does not look like a URI');
-            return null;
+            return false;
         }
         $arr = explode('.', $parsed['host']);
         foreach ($arr as $k => $v) {
@@ -430,8 +428,10 @@ class idna_convert {
         }
         // We will not try to encode strings consisting of basic code points only
         $encodable = false;
-        for ($k = 0, $l = strlen($decoded); $k < $l; $k++) {
-            if (ord($decoded[$k]) > 0x7a) {
+        /** @var array $decodedArray */
+        $decodedArray = is_array($decoded) ? $decoded : explode("", $decoded);
+        foreach ($decodedArray as $k => $v) {
+            if ($v > 0x7a) {
                 $encodable = true;
                 break;
             }
@@ -561,8 +561,8 @@ class idna_convert {
 
     /**
      * Do Nameprep according to RFC3491 and RFC3454
-     * @param    array    $input Unicode Characters
-     * @return   array|string|null   Unicode Characters, Nameprep'd
+     * @param    array $input    Unicode Characters
+     * @return   array|false   Unicode Characters, Nameprep'd
      */
     protected function _nameprep($input)
     {
@@ -580,12 +580,12 @@ class idna_convert {
             // Try to find prohibited input
             if (in_array($v, self::$NP['prohibit']) || in_array($v, self::$NP['general_prohibited'])) {
                 $this->_error('NAMEPREP: Prohibited input U+' . sprintf('%08X', $v));
-                return null;
+                return false;
             }
             foreach (self::$NP['prohibit_ranges'] as $range) {
                 if ($range[0] <= $v && $v <= $range[1]) {
                     $this->_error('NAMEPREP: Prohibited input U+' . sprintf('%08X', $v));
-                    return null;
+                    return false;
                 }
             }
 
@@ -649,7 +649,7 @@ class idna_convert {
     /**
      * Decomposes a Hangul syllable
      * (see http://www.unicode.org/unicode/reports/tr15/#Hangul
-     * @param    int  $char 32bit UCS4 code point
+     * @param    integer $char  32bit UCS4 code point
      * @return   array    Either Hangul Syllable decomposed or original 32bit value as one value array
      */
     protected function _hangul_decompose($char)
@@ -671,7 +671,7 @@ class idna_convert {
     /**
      * Ccomposes a Hangul syllable
      * (see http://www.unicode.org/unicode/reports/tr15/#Hangul
-     * @param    array    $input Decomposed UCS4 sequence
+     * @param    array $input    Decomposed UCS4 sequence
      * @return   array    UCS4 sequence with syllables composed
      */
     protected function _hangul_compose($input)
@@ -713,8 +713,8 @@ class idna_convert {
 
     /**
      * Returns the combining class of a certain wide char
-     * @param    int    $char Wide char to check (32bit integer)
-     * @return   int    Combining class if found, else 0
+     * @param    integer $char    Wide char to check (32bit integer)
+     * @return   integer    Combining class if found, else 0
      */
     protected function _get_combining_class($char)
     {
@@ -723,7 +723,7 @@ class idna_convert {
 
     /**
      * Applies the cannonical ordering of a decomposed UCS4 sequence
-     * @param    array      $input Decomposed UCS4 sequence
+     * @param    array $input      Decomposed UCS4 sequence
      * @return   array      Ordered USC4 sequence
      */
     protected function _apply_cannonical_ordering($input)
@@ -757,14 +757,14 @@ class idna_convert {
 
     /**
      * Do composition of a sequence of starter and non-starter
-     * @param    array      $input UCS4 Decomposed sequence
-     * @return   array|null      Ordered USC4 sequence
+     * @param    array $input      UCS4 Decomposed sequence
+     * @return   array|false      Ordered USC4 sequence
      */
     protected function _combine($input)
     {
         $inp_len = count($input);
         if (0 == $inp_len) {
-            return null;
+            return false;
         }
         foreach (self::$NP['replacemaps'] as $np_src => $np_target) {
             if ($np_target[0] != $input[0]) {
@@ -786,7 +786,7 @@ class idna_convert {
                 return $np_src;
             }
         }
-        return null;
+        return false;
     }
 
     /**
@@ -805,7 +805,7 @@ class idna_convert {
      * Each x represents a bit that can be used to store character data.
      * The five and six byte sequences are part of Annex D of ISO/IEC 10646-1:2000
      * @param string $input
-     * @return array|string|null
+     * @return array|false
      */
     protected function _utf8_to_ucs4($input)
     {
@@ -823,7 +823,7 @@ class idna_convert {
                 ++$out_len;
                 if ('add' == $mode) {
                     $this->_error('Conversion from UTF-8 to UCS-4 failed: malformed input at byte ' . $k);
-                    return null;
+                    return false;
                 }
                 continue;
             }
@@ -848,7 +848,7 @@ class idna_convert {
                     $v = ($v - 252) << 30;
                 } else {
                     $this->_error('This might be UTF-8, but I don\'t understand it at byte ' . $k);
-                    return null;
+                    return false;
                 }
                 if ('add' == $mode) {
                     $output[$out_len] = (int) $v;
@@ -861,7 +861,7 @@ class idna_convert {
                     $test = 'none';
                     if (($v < 0xA0 && $start_byte == 0xE0) || ($v < 0x90 && $start_byte == 0xF0) || ($v > 0x8F && $start_byte == 0xF4)) {
                         $this->_error('Bogus UTF-8 character detected (out of legal range) at byte ' . $k);
-                        return null;
+                        return false;
                     }
                 }
                 if ($v >> 6 == 2) { // Bit mask must be 10xxxxxx
@@ -870,7 +870,7 @@ class idna_convert {
                     --$next_byte;
                 } else {
                     $this->_error('Conversion from UTF-8 to UCS-4 failed: malformed input at byte ' . $k);
-                    return null;
+                    return false;
                 }
                 if ($next_byte < 0) {
                     $mode = 'next';
@@ -884,13 +884,14 @@ class idna_convert {
      * Convert UCS-4 string into UTF-8 string
      * See _utf8_to_ucs4() for details
      * @param string  $input
-     * @return string|null
+     * @return string|false
      */
     protected function _ucs4_to_utf8($input)
     {
         $output = '';
-        for($k = 0, $l = strlen($input); $k < $l; $k++) {
-            $v = ord($input[$k]);
+        /** @var array $inputArray */
+        $inputArray = is_array($input) ? $input : explode("", $input);
+        foreach ($inputArray as $k => $v) {
             if ($v < 128) { // 7bit are transferred literally
                 $output .= chr($v);
             } elseif ($v < (1 << 11)) { // 2 bytes
@@ -901,7 +902,7 @@ class idna_convert {
                 $output .= chr(240 + ($v >> 18)) . chr(128 + (($v >> 12) & 63)) . chr(128 + (($v >> 6) & 63)) . chr(128 + ($v & 63));
             } else {
                 $this->_error('Conversion from UCS-4 to UTF-8 failed: malformed input at byte ' . $k);
-                return null;
+                return false;
             }
         }
         return $output;
@@ -928,7 +929,7 @@ class idna_convert {
      * Convert UCS-4 strin into UCS-4 garray
      *
      * @param  string $input
-     * @return array|null
+     * @return array|false
      */
     protected function _ucs4_string_to_ucs4($input)
     {
@@ -937,7 +938,7 @@ class idna_convert {
         // Input length must be dividable by 4
         if ($inp_len % 4) {
             $this->_error('Input UCS4 string is broken');
-            return null;
+            return false;
         }
         // Empty input - return empty output
         if (!$inp_len) {

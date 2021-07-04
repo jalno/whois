@@ -13,27 +13,36 @@ class nu_handler {
         );
 
         $r = array();
-        while (list($key, $val) = each($data_str['rawdata'])) {
+
+        $lenght = count($data_str['rawdata']);
+
+        $x = 0;
+        foreach ($data_str['rawdata'] as $key => $val) {
+            $x++;
             $val = trim($val);
 
-            if ($val != '') {
-                if ($val == 'Domain servers in listed order:') {
-                    while (list($key, $val) = each($data_str['rawdata'])) {
-                        $val = trim($val);
-                        if ($val == '')
-                            break;
-                        $r['regrinfo']['domain']['nserver'][] = $val;
+            if (empty($val)) {
+                continue;
+            }
+
+            if ($val == 'Domain servers in listed order:') {
+                $y = 0;
+                foreach ($data_str['rawdata'] as $ns) {
+                    $y++;
+                    $ns = trim($ns);
+                    if (++$y < $x) {
+                        continue;
                     }
+                    $r['regrinfo']['domain']['nserver'][] = $val;
                     break;
                 }
+            }
 
-                reset($items);
-
-                while (list($field, $match) = each($items))
-                    if (strstr($val, $match)) {
-                        $r['regrinfo']['domain'][$field] = trim(substr($val, strlen($match)));
-                        break;
-                    }
+            foreach ($items as $field => $match) {
+                if (strstr($val, $match)) {
+                    $r['regrinfo']['domain'][$field] = trim(substr($val, strlen($match)));
+                    break;
+                }
             }
         }
 

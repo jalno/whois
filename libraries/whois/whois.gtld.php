@@ -8,7 +8,6 @@ class gtld_handler extends WhoisClient {
         'Whois Server:' => 'regyinfo.whois',
         'Referral URL:' => 'regyinfo.referrer',
         'Name Server:' => 'regrinfo.domain.nserver.', // identical descriptors
-        'Updated Date:' => 'regrinfo.domain.changed',
         'Last Updated On:' => 'regrinfo.domain.changed',
         'EPP Status:' => 'regrinfo.domain.epp_status.',
         'Status:' => 'regrinfo.domain.status.',
@@ -20,7 +19,6 @@ class gtld_handler extends WhoisClient {
     );
 
     public $result;
-    protected $deepWhois;
 
     function parse($data, $query) {
         $this->query = array();

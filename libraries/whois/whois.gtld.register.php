@@ -14,7 +14,7 @@ class register_handler {
             'domain.sponsor#0' => 'Registrar Name....:',
             'domain.sponsor#1' => 'Registration Service Provided By:',
             'domain.referrer' => 'Registrar Homepage:',
-            'domain.nserver' => 'DNS Servers:',
+            'domain.nserver' => 'Domain servers in listed order:',
             'domain.name' => 'Domain name:',
             'domain.created#0' => 'Created on..............:',
             'domain.created#1' => 'Creation date:',
