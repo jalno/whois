@@ -795,7 +795,7 @@ function get_date($date, $format)
 				break;
 			}
 
-			if ($key !== 'y' && $key !== 'Y' && $val > 1900) {
+			if ($key !== 'y' && $key !== 'Y' && is_numeric($val) && $val > 1900) {
 				$res[$key] = $res['y'];
 				$res['y']  = $val;
 				$ok        = false;
